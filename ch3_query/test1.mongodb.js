@@ -135,5 +135,11 @@ db.inventory.find(
   {},
   { tags: { $elemMatch: { $regex: /^b/ } }, _id: 0, item: 0, qty: 0 }
 );
+
+db.inventory.find(
+  {},
+  { tags: { $elemMatch: { $regex: /^b/ } }, qty: 1, item: 1 }
+);
+
 // #특정 조건에 부합하는 첫번째 데이터만 출력하라
 db.inventory.find({ tags: "red" }, { "tags.$": true });
