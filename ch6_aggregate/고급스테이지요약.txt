@@ -78,6 +78,7 @@ output: {
 //p165 고급스테이지 bucket
 //필드의 범위에 따라서 그룹화
 // group 필드 값으로 그룹화를 했음.
+
 db.rating.aggregate([
 {
 $bucket: {
@@ -192,7 +193,7 @@ rating에 따라 각각의 도큐먼트 수를 세는 스테이지
 , categorizedById(Auto) 필드의 배열에
 _id에 따라 자동으로 5개 그룹으로 나누기 스테이지
 
-5 $lookup
+5 $lookup -> RDBMS join 과 비슷. 
 같은 디비에 있으면서, 샤딩되지 않은 외부 컬렉션에
 대해서 현재 필드와 외부 컬렉션의 필드가 일치하면
 배열로 외부 컬렉션 도큐먼트를 가져옴.

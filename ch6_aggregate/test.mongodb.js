@@ -156,3 +156,75 @@ db.rating.aggregate([
     $skip: 1, // 순서3
   },
 ]);
+
+// 고급 스테이지 소개.
+// $bucket
+db.rating.aggregate([
+  {
+    $bucket: {
+      groupBy: "$rating",
+      boundaries: [2, 3, 5],
+      default: "Others", // 범위 밖의 기본값 필드의 이름.
+      output: {
+        count: { $sum: 1 },
+        user_ids: { $push: "$user_id" }, // 배열로 나타내기.
+      },
+    },
+  },
+]);
+
+//고급 스테이지 , $facet -> 배열로 만들기, $bucketAuto , 자동 등분 나누기.
+db.rating.aggregate([
+  {
+    $facet: {
+      categorizedByRating: [{ $group: { _id: "$rating", count: { $sum: 1 } } }],
+      "categorizedById(Auto)": [
+        { $bucketAuto: { groupBy: "$_id", buckets: 5 } },
+      ],
+    },
+  },
+]);
+
+//$lookup
+db.by_month.aggregate([
+  {
+    $lookup: {
+      from: "area",
+      localField: "area_id",
+      foreignField: "_id",
+      as: "area_data",
+    },
+  },
+  { $limit: 1 },
+]);
+
+//$replaceRoot
+db.by_month.aggregate([
+  {
+    $addFields: {
+      "month_data.city_or_province": "$city_or_province",
+      "month_data.county": "$county",
+    },
+  },
+  {
+    $replaceRoot: {
+      newRoot: {
+        $arrayElemAt: ["$month_data", 2],
+      },
+    },
+  },
+]);
+
+//sample -> 랜덤뽑기
+db.rating.aggregate([
+  {
+    $sample: { size: 3 },
+  },
+]);
+
+//sortByCount
+db.rating.aggregate([
+  {
+    $sortByCount: "$rating",
+  },
+]);
