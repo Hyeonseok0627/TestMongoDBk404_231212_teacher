@@ -1,16 +1,41 @@
 db.stores.getIndexes();
+
 db.employees.getIndexes();
 // # Single-key 인덱스
 db.employees.createIndex({ empno: 1 });
 db.employees.createIndex({ empno: 1, deptno: -1 });
 // # Compound 인덱스
+// 인덱스 설정 조회
 db.employees.getIndexes();
+
 db.employees.createIndex({ deptno: 1 });
 db.employees.find({ deptno: 10 }).pretty();
+
+// empno : 검색 explain 확인.
+// 인덱스 설정
+db.employees.find({ empno: 101 }).explain();
+
+// 인덱스 설정 아직 안함.
 db.employees.find({ deptno: 10 }).explain();
+
+// 인덱스 설정 후 확인.
+db.employees.find({ deptno: 10 }).explain();
+
 db.employees.find({ deptno: 10 }).sort({ empno: -1 });
 db.employees.find({ deptno: 10 }).sort({ empno: -1 }).explain();
+
+//
+db.employees.find({ empno: 101 }).sort({ deptno: -1 }).explain();
+
+// 인덱스 삭제
 db.employees.dropIndex({ empno: 1 });
+db.employees.dropIndex({ deptno: 1 });
+
+// 삭제 후, 확인.
+db.employees.getIndexes();
+
+// deptno 조회식, 인덱스로 검색을 안하는 부분 확인.
+db.employees.find({ deptno: 10 }).explain();
 
 //샘플 코드
 db.employees.insertMany([
@@ -98,12 +123,18 @@ db.employees.insertMany([
 
 // 좌표 관련 , 인덱스 이용해서 검색 해보기.
 db.users.insertOne({ x: 1 });
+
 // GeoSpatial INDEX
 for (var i = 0; i < 100; i++) {
   db.spatial.insert({ pos: [i % 10, Math.floor(i / 10)] });
 }
+
 db.spatial.ensureIndex({ pos: "2d" });
 db.spatial.find({ pos: { $near: [5, 5] } }, { _id: 0 }).limit(5);
+db.spatial
+  .find({ pos: { $near: [5, 5] } }, { _id: 0 })
+  .limit(5)
+  .explain();
 //CENTER
 db.spatial.find({ pos: { $within: { $center: [[5, 5], 2] } } }, { _id: 0 });
 //BOX
